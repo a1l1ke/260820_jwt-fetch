@@ -29,4 +29,14 @@ public class AuthCookieUtil {
                 .maxAge(p.jwt().accessTokenExpiry())
                 .build();
     }
+
+    public ResponseCookie createRefreshTokenCookie(String token) {
+        return ResponseCookie.from("refreshToken", token)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(p.jwt().refreshTokenExpiry())
+                .build();
+    }
 }

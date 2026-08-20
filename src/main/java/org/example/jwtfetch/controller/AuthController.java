@@ -19,13 +19,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Validated @RequestBody LoginForm dto) {
-        String token = userAccountService.login(dto.username(), dto.password());
-        ResponseCookie accessTokenCookie = authCookieUtil.createAccessTokenCookie(token);
+//        String token = userAccountService.login(dto.username(), dto.password());
+        UserAccountService.TokenResult result = userAccountService.login(dto.username(), dto.password());
+        ResponseCookie accessTokenCookie = authCookieUtil.createAccessTokenCookie(result.accessToken());
+        ResponseCookie refreshTokenCookie = authCookieUtil.createRefreshTokenCookie(result.refreshToken());
         return ResponseEntity.ok()
 //                .header("Set-Cookie", accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE,
                         accessTokenCookie.toString())
-                .body(token);
+                .header(HttpHeaders.SET_COOKIE,
+                        refreshTokenCookie.toString())
+                .body(result.accessToken());
     }
 
     @DeleteMapping("/logout")
