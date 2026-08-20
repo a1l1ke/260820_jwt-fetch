@@ -1,6 +1,5 @@
 package org.example.jwtfetch.controller;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.example.jwtfetch.auth.AuthCookieUtil;
 import org.example.jwtfetch.auth.JwtProvider;
@@ -10,6 +9,7 @@ import org.example.jwtfetch.service.UserAccountService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +37,17 @@ public class AuthController {
 
     @DeleteMapping("/logout")
     // import org.springframework.security.core.Authentication;
-    public ResponseEntity<Void> logout(@CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<Void> logout(
+//            @CookieValue("refreshToken") String refreshToken
+            Authentication authentication
+    ) {
         ResponseCookie accessTokenCookie = authCookieUtil.deleteAccessTokenCookie();
         // authentication.getName() -> username
-        Claims claims = jwtProvider.parseToken(refreshToken);
-        refreshTokenRepository.deleteById(claims.getId());
+//        Claims claims = jwtProvider.parseToken(refreshToken);
+//        refreshTokenRepository.deleteById(claims.getId());
+        refreshTokenRepository.deleteAll(
+                refreshTokenRepository.findByUsername(authentication.getName())
+        );
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE,
                         accessTokenCookie.toString())
