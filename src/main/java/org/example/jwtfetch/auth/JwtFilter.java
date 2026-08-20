@@ -7,8 +7,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.jwtfetch.config.AuthProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,9 +18,9 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(AuthProperties.class)
+//@EnableConfigurationProperties(AuthProperties.class)
 public class JwtFilter extends OncePerRequestFilter {
-    private final AuthProperties p;
+//    private final AuthProperties p;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -43,6 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContext context = SecurityContextHolder.getContext();
 //            context.setAuthentication(null);
             context.setAuthentication(auth);
+            System.out.println("인증 완료");
         } catch (Exception e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();
@@ -65,7 +64,9 @@ public class JwtFilter extends OncePerRequestFilter {
         return null;
     }
 
+    private final JwtProvider jwtProvider;
+
     private Claims extractClaims(String token) {
-        return null;
+        return jwtProvider.parseToken(token);
     }
 }
